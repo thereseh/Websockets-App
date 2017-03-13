@@ -1,0 +1,34 @@
+{
+  "name": "websockets-app",
+  "version": "1.0.0",
+  "engines": {
+    "node": "7.4.0",
+    "npm": "4.0.5"
+  },
+  "description": "An multi-user app using websockets",
+  "main": "./src/server.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src",
+    "test": "echo \"No Tests\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thereseh/Websockets-App.git"
+  },
+  "author": "Therese Henriksson",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/thereseh/Websockets-App/issues"
+  },
+  "homepage": "https://github.com/thereseh/Websockets-App#readme",
+  "devDependencies": {
+    "eslint": "^3.17.1",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0"
+  },
+  "dependencies": {
+    "express": "^4.15.0",
+    "socket.io": "^1.7.3"
+  }
+}

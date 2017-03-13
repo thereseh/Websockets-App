@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<body>
+   <h1 id="indexh1">Let's Play Battleship!</h1>
+  <div class="row">
+  <div class="col-lg-6">
+    <div class="input-group" id="inputUser">
+      <input type="text" id="username" class="form-control" placeholder="Username...">
+      <span class="input-group-btn">
+        <button class="btn btn-default" id="connect" type="button">Connect!</button>
+      </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->
+</div><!-- /.row -->
+  <div id="wrapper">
+    <div id="canvasHolder">
+    <div id="yourBoard">
+       <h2 id="opponent"></h2>
+      <br>
+       <div class="btn-group-vertical" id="ships" role="group" aria-label="...">
+      <button type="button" id="btn1" class="btn btn-default">Ship 1</button>
+      <button type="button" id="btn2" class="btn btn-default">Ship 2</button>
+      <button type="button" id="btn3" class="btn btn-default">Ship 3</button>
+      </div>
+    <canvas id="canvas" height="350" width="350">Please use an HTML 5 browser</canvas>
+    </div>
+    <div id="oppBoard">
+    <h2 id="you"></h2>
+    <br>
+    <canvas id="serverCanvas" height="350" width="350">Please use an HTML 5 browser</canvas>
+    </div>
+      <br>
+    <button type="button" id="btn4" class="btn btn-default">Let's Play!</button>
+  </div>
+  </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <link rel="stylesheet" type="text/css" href="/styles.css">
+  <script type="text/babel" src="/script.js"></script>
+</body>
+</html>

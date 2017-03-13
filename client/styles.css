@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500|Satisfy');
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+h1 {
+  text-align: center;
+  font-size: 50px;
+}
+
+#indexh1 {
+  padding-top: 30px;
+  text-align: center;
+  font-size: 50px;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 0;
+}
+h3 {
+  margin-top: 0;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+p {
+  font-weight: 400;
+}
+
+label {
+  margin-right: 5px;
+}
+
+#wrapper {
+  height: 600px;
+  padding-top: 20px;
+  padding-bottom: 50px;
+  width: auto;
+  align-content: center;
+  text-align: center;
+}
+
+#canvasHolder {
+  vertical-align: top;
+}
+
+
+#canvas {
+  display: none;
+  cursor: pointer;
+  margin-top: 15px;
+  border: 3px solid darkgray;
+}
+
+#you, #opponen {
+  display: none;
+}
+
+
+#oppBoard {
+  margin-left: 40px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+#yourBoard {
+  display: inline-block;
+  vertical-align: top;
+}
+
+#serverCanvas {
+  display: none;
+  cursor: pointer;
+  margin-top: 15px;
+  border: 3px solid darkgray;
+}
+
+.btn-group-vertical {
+  display: none;
+  vertical-align: top;
+  margin-right: 30px;
+  margin-top: 15px;
+   float: none;!important
+}
+
+#btn4 {
+  display: none;
+  align-content: center;!important
+  text-align: center;!important
+  float: none;!important
+  margin:auto;!important
+  text-align: center;!important
+}
+
+.row {
+  padding-top: 10px;
+  width: 400px;
+  margin:auto;!important
+  float: none;!important
+  text-align: auto;!important
+  align-content: center;!important
+}
+.col-lg-6 {
+  width: 100%;
+  margin:auto;!important
+  text-align: center;!important
+  align-content: center;!important
+  float: none;!important
+}
