@@ -233,6 +233,7 @@
     // this begins the game by displaying the other canvas
     const play = document.querySelector("#btn4");
     play.addEventListener('click', (e) => {
+      document.querySelector("#indexh1").style.display = "none";
       document.querySelector("#serverCanvas").style.display = "inline-block";
       document.querySelector("#you").style.display = "inline-block";
       document.querySelector("#opponent").style.display = "inline-block";
