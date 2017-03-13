@@ -57,7 +57,7 @@ const onJoined = (sock) => {
     // to be a drawer, or guessed correctly
     const obj = { id: socket.id, name: socket.name };
     // add user to player gueue, can only be 2
-    if (playerList.length < 2) {
+    if (playerList.length <= 2) {
       playerList.push(obj);
       // everyone else will be spectators
     } else {

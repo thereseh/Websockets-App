@@ -416,6 +416,7 @@
     serverCtx = serverCanvas.getContext("2d");
     const connect = document.querySelector("#connect");
     connect.addEventListener('click', () => {
+      console.log('connect');
       connectSocket();
     });
   }; 
