@@ -28,10 +28,10 @@
       
       if (x+10)
       if (b1) {
-        if (x+35 <= (canvas.width-35)) {
+        if ((x+35) <= (canvas.width-35)) {
         ctx.fillRect(x,y,35,35);
         ctx.fillRect(x+35,y,35,35);
-      } else if (x < 0) {
+      } else if (x <= 0) {
         ctx.fillRect(0,y,35,35);
         ctx.fillRect(35,y,35,35);
       } else {
@@ -39,11 +39,11 @@
         ctx.fillRect(canvas.width-35,y,35,35);
       }
       } else if (b2) {
-        if (x+70 <= (canvas.width-35)) {
+        if ((x+70) <= (canvas.width-35)) {
         ctx.fillRect(x,y,35,35);
         ctx.fillRect(x+35,y,35,35);
         ctx.fillRect(x+70,y,35,35);
-        } else if (x < 0) {
+        } else if (x <= 0) {
         ctx.fillRect(0,y,35,35);
         ctx.fillRect(35,y,35,35);
         ctx.fillRect(70,y,35,35);
@@ -54,12 +54,12 @@
         }
        
       } else if (b3) {
-        if (x+35 <= (canvas.width-35)) {
+        if ((x+35) <= (canvas.width-35)) {
         ctx.fillRect(x,y,35,35);
         ctx.fillRect(x+35,y,35,35);
         ctx.fillRect(x+70,y,35,35);
         ctx.fillRect(x+105,y,35,35);
-      } else if (x < 0) {
+      } else if (x <= 0) {
         ctx.fillRect(0,y,35,35);
         ctx.fillRect(35,y,35,35);
         ctx.fillRect(70,y,35,35);
@@ -315,14 +315,14 @@
             // make sure you are within the canvas
             // all other checks is temporary, much find a better more efficient way to do check
             // to make sure the squares making up the ships are staying within the canvas
-            if (y <= canvas.height && y= > 0) {
+            if (y <= canvas.height && y >= 0) {
            if (b1) {  
              let f1;
              let f2;
             if (x+35 <= (canvas.width-35)) {
               f1 = { x: x, y: y, w: 35, h: 35 };
               f2 = { x: (x+35),y: y, w: 35, h: 35 };
-            } else if (x < 0) {
+            } else if (x <= 0) {
               f1 = { x: 0, y: y, w: 35, h: 35 };
               f2 = { x: 35,y: y, w: 35, h: 35 };
             } else {
@@ -342,7 +342,7 @@
                 s1 = { x: x, y: y, w: 35, h: 35 };
                 s2 = { x: (x+35),y: y, w: 35, h: 35 };
                 s3 = { x: (x+70),y: y, w: 35, h: 35 };
-            } else if (x < 0) {
+            } else if (x <= 0) {
                 s1 = { x: 0, y: y, w: 35, h: 35 };
                 s2 = { x: 35,y: y, w: 35, h: 35 };
                 s3 = { x: 70,y: y, w: 35, h: 35 };
@@ -367,7 +367,7 @@
               t2 = { x: (x+35),y: y, w: 35, h: 35 };
               t3 = { x: (x+70),y: y, w: 35, h: 35 };
               t4 = { x: (x+105),y: y, w: 35, h: 35 };
-            } else if (x < 0) {
+            } else if (x <= 0) {
               t1 = { x: 0, y: y, w: 35, h: 35 };
               t2 = { x: 35,y: y, w: 35, h: 35 };
               t3 = { x: 70,y: y, w: 35, h: 35 };
