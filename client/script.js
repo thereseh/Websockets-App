@@ -223,6 +223,7 @@ const checkDestroy = () => {
       }
       if (numHit === numParts) {
         ships[i].destroyed = true;
+        socket.emit('destroyed', ships[i] );
       }
     }
   }
@@ -392,6 +393,38 @@ const checkDestroy = () => {
   socket.on('msg', (data) => {
     console.log(data);
   });
+    
+    socket.on('point', (data) => {
+      console.dir(data.length);
+      if (user === player1) {
+        if (data.length === 2) {
+          console.log(data.length === 2);
+          document.querySelector("#p2s1").style.fontStyle = "red";
+        }
+        if (data.length === 3) {
+          console.log(data.length === 3);
+          document.querySelector("#p2s2").style.fontStyle = "red";
+        }
+        if (data.length === 4) {
+          console.log(data.length === 4);
+          document.querySelector("#p2s3").style.fontStyle = "red";
+        }
+      }
+      if (user === player2) {
+        if (data.length === 2) {
+          console.log(data.length === 2);
+          document.querySelector("#p1s1").style.fontStyle = "red";
+        }
+        if (data.length === 3) {
+          console.log(data.length === 3);
+          document.querySelector("#p1s2").style.fontStyle = "red";
+        }
+        if (data.length === 4) {
+          console.log(data.length === 4);
+          document.querySelector("#p1s3").style.fontStyle = "red";
+        }
+      }
+    });
     
   // set up if an audience
   socket.on('audienceSetUp', (data) => {

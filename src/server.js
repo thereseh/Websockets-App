@@ -104,6 +104,9 @@ const nextRound = (sock) => {
     if (indexDrawer === playerList.length) {
       indexDrawer = 0;
     }
+    socket.on('destroyed', (data) => {
+      io.to(playerList[indexDrawer].id).emit('point', data);
+    });
     // tell next client it's his turn
     io.to(playerList[indexDrawer].id).emit('updateTurn', true);
   });
@@ -127,7 +130,7 @@ const onDrawer = (sock) => {
   });
   socket.on('sendBoard', (data) => {
     if (data.user === namePlayer1) {
-      player1B = []; 
+      player1B = [];
       player1OtherGuesses = [];
       for (let i = 0; i < data.ships.length; i++) {
         player1B.push(data.ships[i]);
@@ -140,7 +143,7 @@ const onDrawer = (sock) => {
       player2OtherGuesses = [];
       for (let i = 0; i < data.ships.length; i++) {
         player2B.push(data.ships[i]);
-      }  
+      }
       for (let i = 0; i < data.otherGuesses.length; i++) {
         player2OtherGuesses.push(data.otherGuesses[i]);
       }
