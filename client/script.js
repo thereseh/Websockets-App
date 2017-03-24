@@ -395,32 +395,26 @@ const checkDestroy = () => {
   });
     
     socket.on('point', (data) => {
-      console.dir(data.length);
+      console.dir(data.parts.length);
       if (user === player1) {
-        if (data.length === 2) {
-          console.log(data.length === 2);
+        if (data.parts.length === 2) {
           document.querySelector("#p2s1").style.fontStyle = "red";
         }
-        if (data.length === 3) {
-          console.log(data.length === 3);
+        if (data.parts.length === 3) {
           document.querySelector("#p2s2").style.fontStyle = "red";
         }
-        if (data.length === 4) {
-          console.log(data.length === 4);
+        if (data.parts.length === 4) {
           document.querySelector("#p2s3").style.fontStyle = "red";
         }
       }
       if (user === player2) {
-        if (data.length === 2) {
-          console.log(data.length === 2);
+        if (data.parts.length === 2) {
           document.querySelector("#p1s1").style.fontStyle = "red";
         }
-        if (data.length === 3) {
-          console.log(data.length === 3);
+        if (data.parts.length === 3) {
           document.querySelector("#p1s2").style.fontStyle = "red";
         }
-        if (data.length === 4) {
-          console.log(data.length === 4);
+        if (data.parts.length === 4) {
           document.querySelector("#p1s3").style.fontStyle = "red";
         }
       }
