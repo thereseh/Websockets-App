@@ -4,12 +4,13 @@
 <head>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <script type="text/babel" src="/script.js"></script>
+  <link rel='stylesheet' type="text/css" href='/assets/bootstrap/css/bootstrap.min.css' />
 </head>
 
 <body>
    <h1 id="indexh1">Let's Play Battleship!</h1>
+   <h3 id="indexh3"></h3>
+   <h1 id="guest">Waiting for players to get ready...</h1>
   <div class="row">
   <div class="col-lg-6">
     <div class="input-group" id="inputUser">
@@ -30,11 +31,21 @@
       <button type="button" id="btn2" class="btn btn-default">Ship 2</button>
       <button type="button" id="btn3" class="btn btn-default">Ship 3</button>
       </div>
+      <ul class="list-group" id="player1List">
+        <li class="list-group-item">Ship1</li>
+        <li class="list-group-item">Ship2</li>
+        <li class="list-group-item">Ship3</li>
+      </ul>
     <canvas id="canvas" height="350" width="350">Please use an HTML 5 browser</canvas>
     </div>
     <div id="oppBoard">
     <h2 id="you"></h2>
     <br>
+    <ul class="list-group" id="player2List">
+      <li class="list-group-item">Ship1</li>
+      <li class="list-group-item">Ship2</li>
+      <li class="list-group-item">Ship3</li>
+    </ul>
     <canvas id="serverCanvas" height="350" width="350">Please use an HTML 5 browser</canvas>
     </div>
       <br>
@@ -42,7 +53,9 @@
   </div>
   </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <link rel="stylesheet" type="text/css" href="/styles.css">
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+    <link rel='stylesheet' type="text/css" href='/styles.css' />
+    <script src='/script.js'></script>
+
 </body>
 </html>

@@ -7,6 +7,8 @@ const socketio = require('socket.io');
 
 const PORT = process.env.PORT || process.env.NODE_PORT || 3000;
 
+app.use('/assets', express.static(path.resolve(`${__dirname}/../public/`)));
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(`${__dirname}/../client/index.html`));
 });
@@ -29,6 +31,12 @@ const users = {};
 let playerList = [];
 const audienceList = [];
 let indexDrawer = 0;
+let namePlayer1;
+let namePlayer2;
+let player1B = [];
+let player2B = [];
+let player1OtherGuesses = [];
+let player2OtherGuesses = [];
 // to store chat log, so that new users can get updated on ongoing conversation
 const onJoined = (sock) => {
   const socket = sock;
@@ -57,16 +65,26 @@ const onJoined = (sock) => {
     // to be a drawer, or guessed correctly
     const obj = { id: socket.id, name: socket.name };
     // add user to player gueue, can only be 2
-    if (playerList.length <= 2) {
+    if (playerList.length < 2) {
       playerList.push(obj);
       // everyone else will be spectators
     } else {
       audienceList.push(obj);
+      if (player1B.length > 0 || player2B.length > 0) {
+        socket.emit('audienceSetUp', { namePlayer1, namePlayer2, audience: true, player1B, player2B, player1OtherGuesses, player2OtherGuesses });
+      } else {
+        socket.emit('audienceSetUp', { namePlayer1, namePlayer2, audience: true });
+      }
     }
     // first person to joing server will guess first
     if (Object.keys(users).length === 1) {
-      // indexDrawer = 0;
-      socket.emit('updateTurn', true);
+      namePlayer1 = socket.name;
+    }
+    if (Object.keys(users).length === 2) {
+      namePlayer2 = playerList[1].name;
+      io.sockets.emit('setup', { namePlayer1, namePlayer2 });
+      io.to(playerList[0].id).emit('updateTurn', true);
+      io.to(playerList[1].id).emit('updateTurn', false);
     }
     socket.broadcast.to('room1').emit('msg', response);
     console.log(`${data.name} joined`);
@@ -106,6 +124,30 @@ const onDrawer = (sock) => {
   // clear canvas of all
   socket.on('clearCanvas', () => {
     io.sockets.emit('clearCanvas');
+  });
+  socket.on('sendBoard', (data) => {
+    if (data.user === namePlayer1) {
+      player1B = []; 
+      player1OtherGuesses = [];
+      for (let i = 0; i < data.ships.length; i++) {
+        player1B.push(data.ships[i]);
+      }
+      for (let i = 0; i < data.otherGuesses.length; i++) {
+        player1OtherGuesses.push(data.otherGuesses[i]);
+      }
+    } else if (data.user === namePlayer2) {
+      player2B = [];
+      player2OtherGuesses = [];
+      for (let i = 0; i < data.ships.length; i++) {
+        player2B.push(data.ships[i]);
+      }  
+      for (let i = 0; i < data.otherGuesses.length; i++) {
+        player2OtherGuesses.push(data.otherGuesses[i]);
+      }
+    }
+    for (let i = 0; i < audienceList.length; i++) {
+      io.to(audienceList[i].id).emit('sendBoard', data);
+    }
   });
 };
 

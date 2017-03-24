@@ -1,111 +1,310 @@
 "use strict"
 
   let ctx, canvas, serverCtx, serverCanvas;
-  let user;
-  let linesToDraw = [];
-  let btn1 = false, btn2 = false, btn3 = false;
+  let user, player1, player2;
   let socket;
   let playing = false;
   let placing = true;
-  let myGuessPos;
-  let ships = [];
+  let audience = false;
   let myGuesses = [], otherGuesses = [];
-  let b1 = false, b2 = false, b3 = false;
+  let ship1 = {
+    parts:[
+      { x: 0, y: 0, w: 35, h: 35, hit:false, color: 'blue' },
+      { x: 0, y: 0, w: 35, h: 35, hit:false, color: 'blue' }
+    ],
+    destroyed:false, 
+    placing:false, 
+    vert:false, 
+    placed:false
+  };
+  let ship2 = { 
+    parts:[
+      { x: 0, y: 0, w: 35, h: 35, hit:false, color: 'blue'},
+      { x: 0, y: 0, w: 35, h: 35, hit:false, color: 'blue'},
+      { x: 0, y: 0, w: 35, h: 35, hit:false, color: 'blue'}
+    ],
+    destroyed:false,
+    placing:false,
+    vert:false,
+    placed:false
+  };
+  let ship3 = { 
+    parts:[
+      { x: 0, y: 0, w: 35, h: 35, hit:false, color: 'blue'},
+      { x: 0, y: 0, w: 35, h: 35, hit:false, color: 'blue'},
+      { x: 0, y: 0, w: 35, h: 35, hit:false, color: 'blue'},
+      { x: 0, y: 0, w: 35, h: 35, hit:false, color: 'blue'}
+    ],
+    destroyed:false,
+    placing:false,
+    vert:false,
+    placed:false
+  };
+  const ships = [ship1, ship2, ship3];
+  let audienceP1 = [];
+  let audienceP2 = [];
+  let player1Attacks = [];
+  let player2Attacks = [];
 
 
  // ====== NON SERVER METHODS ====== //
 
 // the drawing method for when user is trying to place ships
-// will add soon so player can change direction of ships
-// must find a more efficient way for this
+// keypress of "R" will allow for rotation of boats
   const draw = (pos) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     displayGrid();
     ctx.fillStyle = 'blue';
+    let x = Math.floor(pos.x/35)*35;
+    let y = Math.floor(pos.y/35)*35;
+    
     if (placing) {
-       let x = Math.floor(pos.x/35)*35;
-       let y = Math.floor(pos.y/35)*35;
-      
-      if (x+10)
-      if (b1) {
-        if ((x+35) <= (canvas.width-35)) {
-        ctx.fillRect(x,y,35,35);
-        ctx.fillRect(x+35,y,35,35);
-      } else if (x <= 0) {
-        ctx.fillRect(0,y,35,35);
-        ctx.fillRect(35,y,35,35);
-      } else {
-        ctx.fillRect(canvas.width-70,y,35,35);
-        ctx.fillRect(canvas.width-35,y,35,35);
-      }
-      } else if (b2) {
-        if ((x+70) <= (canvas.width-35)) {
-        ctx.fillRect(x,y,35,35);
-        ctx.fillRect(x+35,y,35,35);
-        ctx.fillRect(x+70,y,35,35);
-        } else if (x <= 0) {
-        ctx.fillRect(0,y,35,35);
-        ctx.fillRect(35,y,35,35);
-        ctx.fillRect(70,y,35,35);
+    if (ship1.placing) {
+      if (ship1.vert) {
+        if (x >= canvas.width) {
+          ctx.fillRect(canvas.width-35,y,35,35);
+          ctx.fillRect(canvas.width-35,y+35,35,35);
+        } else if (x < 0) {
+          ctx.fillRect(0,y,35,35);
+          ctx.fillRect(0,y+35,35,35);
+        } else if (y+35 >= canvas.height) {
+          ctx.fillRect(x,canvas.height-70,35,35);
+          ctx.fillRect(x,canvas.height-35,35,35);
+        } else if(y < 0) {
+          ctx.fillRect(x,0,35,35);
+          ctx.fillRect(x,35,35,35);
         } else {
-        ctx.fillRect(canvas.width-105,y,35,35);
-        ctx.fillRect(canvas.width-70,y,35,35);
-        ctx.fillRect(canvas.width-35,y,35,35);
+          ctx.fillRect(x,y,35,35);
+          ctx.fillRect(x,y+35,35,35);
         }
-       
-      } else if (b3) {
-        if ((x+35) <= (canvas.width-35)) {
-        ctx.fillRect(x,y,35,35);
-        ctx.fillRect(x+35,y,35,35);
-        ctx.fillRect(x+70,y,35,35);
-        ctx.fillRect(x+105,y,35,35);
-      } else if (x <= 0) {
-        ctx.fillRect(0,y,35,35);
-        ctx.fillRect(35,y,35,35);
-        ctx.fillRect(70,y,35,35);
-         ctx.fillRect(105,y,35,35);
       } else {
-        ctx.fillRect(canvas.width-140,y,35,35);
-         ctx.fillRect(canvas.width-105,y,35,35);
-        ctx.fillRect(canvas.width-70,y,35,35);
-        ctx.fillRect(canvas.width-35,y,35,35);
-      }
-      } 
-        for(let i = 0; i < ships.length; i++) {
-          ctx.fillRect(ships[i].x,ships[i].y,ships[i].w,ships[i].h);
+          if (x+35 >= canvas.width) {
+              ctx.fillRect(canvas.width-70,y,35,35);
+              ctx.fillRect(canvas.width-35,y,35,35);
+            } else if (x < 0) {
+              ctx.fillRect(0,y,35,35);
+              ctx.fillRect(35,y,35,35);
+            } else if(y >= canvas.height) {
+              ctx.fillRect(x,canvas.height-35,35,35);
+              ctx.fillRect(x+35,canvas.height-35,35,35);
+            } else if(y < 0) {
+              ctx.fillRect(x,0,35,35);
+              ctx.fillRect(x+35,0,35,35);
+            } else {
+              ctx.fillRect(x,y,35,35);
+              ctx.fillRect(x+35,y,35,35);
+            }
         }
-        
+    }
+    if (ship2.placing) {
+      if (ship2.vert) {
+        if (x >= canvas.width) {
+          ctx.fillRect(canvas.width-35,y,35,35);
+          ctx.fillRect(canvas.width-35,y+35,35,35);
+          ctx.fillRect(canvas.width-35,y+70,35,35);
+        } else if (x < 0) {
+          ctx.fillRect(0,y,35,35);
+          ctx.fillRect(0,y+35,35,35);
+          ctx.fillRect(0,y+70,35,35);
+        } else if(y+70 >= canvas.height) {
+          ctx.fillRect(x,canvas.height-105,35,35);
+          ctx.fillRect(x,canvas.height-70,35,35);
+          ctx.fillRect(x,canvas.height-35,35,35); 
+        } else if(y < 0) {
+          ctx.fillRect(x,0,35,35);
+          ctx.fillRect(x,35,35,35);
+          ctx.fillRect(x,70,35,35);
+        } else {
+          ctx.fillRect(x,y,35,35);
+          ctx.fillRect(x,y+35,35,35);
+          ctx.fillRect(x,y+70,35,35);
+        }
+      } else {
+        if (x+70 >= canvas.width) {
+            ctx.fillRect(canvas.width-105,y,35,35);
+            ctx.fillRect(canvas.width-70,y,35,35);
+            ctx.fillRect(canvas.width-35,y,35,35);
+          } else if (x < 0) {
+            ctx.fillRect(0,y,35,35);
+            ctx.fillRect(35,y,35,35);
+            ctx.fillRect(70,y,35,35);
+          } else if(y >= canvas.height) {
+            ctx.fillRect(x,canvas.height-35,35,35);
+            ctx.fillRect(x+35,canvas.height-35,35,35);
+            ctx.fillRect(x+70,canvas.height-35,35,35);
+          } else if (y < 0) {
+            ctx.fillRect(x,0,35,35);
+            ctx.fillRect(x+35,0,35,35);
+            ctx.fillRect(x+70,0,35,35);
+          } else {
+            ctx.fillRect(x,y,35,35);
+            ctx.fillRect(x+35,y,35,35);
+            ctx.fillRect(x+70,y,35,35);
+          }
+      }
+    }
+    if (ship3.placing) {
+      if (ship3.vert) {
+        if (x >= canvas.width) {
+          ctx.fillRect(canvas.width-35,y,35,35);
+          ctx.fillRect(canvas.width-35,y+35,35,35);
+          ctx.fillRect(canvas.width-35,y+70,35,35);
+          ctx.fillRect(canvas.width-35,y+105,35,35);
+        } else if (x < 0) {
+          ctx.fillRect(0,y,35,35);
+          ctx.fillRect(0,y+35,35,35);
+          ctx.fillRect(0,y+70,35,35);
+          ctx.fillRect(0,y+105,35,35);
+        } else if (y+105 >= canvas.height) {
+          ctx.fillRect(x,canvas.height-140,35,35);
+          ctx.fillRect(x,canvas.height-105,35,35);
+          ctx.fillRect(x,canvas.height-70,35,35);
+          ctx.fillRect(x,canvas.height-35,35,35); 
+        } else if (y < 0) {
+          ctx.fillRect(x,0,35,35);
+          ctx.fillRect(x,35,35,35);
+          ctx.fillRect(x,70,35,35);
+          ctx.fillRect(x,105,35,35);
+        } else {
+          ctx.fillRect(x,y,35,35);
+          ctx.fillRect(x,y+35,35,35);
+          ctx.fillRect(x,y+70,35,35);
+          ctx.fillRect(x,y+105,35,35);
+          }
+      } else {
+        if (x+105 >= canvas.width) {
+            ctx.fillRect(canvas.width-140,y,35,35);
+            ctx.fillRect(canvas.width-105,y,35,35);
+            ctx.fillRect(canvas.width-70,y,35,35);
+            ctx.fillRect(canvas.width-35,y,35,35);
+          } else if (x < 0) {
+            ctx.fillRect(0,y,35,35);
+            ctx.fillRect(35,y,35,35);
+            ctx.fillRect(70,y,35,35);
+            ctx.fillRect(105,y,35,35);
+          } else if(y >= canvas.height) {
+            ctx.fillRect(x,canvas.height-35,35,35);
+            ctx.fillRect(x+35,canvas.height-35,35,35);
+            ctx.fillRect(x+70,canvas.height-35,35,35);
+            ctx.fillRect(x+105,canvas.height-35,35,35);
+          } else if(y < 0) {
+            ctx.fillRect(x,0,35,35);
+            ctx.fillRect(x+35,0,35,35);
+            ctx.fillRect(x+70,0,35,35);
+            ctx.fillRect(x+105,0,35,35);
+          } else {
+            ctx.fillRect(x,y,35,35);
+            ctx.fillRect(x+35,y,35,35);
+            ctx.fillRect(x+70,y,35,35);
+            ctx.fillRect(x+105,y,35,35);
+          }
+      }
+    }  
+    //draws placed boats
+     for (let i = 0; i < ships.length; i++) {
+        if (ships[i].placed) {
+          for (let j = 0; j < ships[i].parts.length; j++) {
+            ctx.fillRect(ships[i].parts[j].x, ships[i].parts[j].y, ships[i].parts[j].w, ships[i].parts[j].h);
+          }
+        }
+      }
     }
   };
+
+const checkDestroy = () => {
+  for (let i = 0; i < ships.length; i++) {
+    let numParts = ships[i].parts.length;
+    let numHit = 0;
+    if (ships[i].placed) {
+      for (let j = 0; j < numParts; j++) { 
+        if (ships[i].parts[j].hit) {
+          numHit++;
+        }
+      }
+      if (numHit === numParts) {
+        ships[i].destroyed = true;
+      }
+    }
+  }
+};
 
 // drawing method for when the game is happening
+// it draws differently depending on if the cient is a player or an audience
   const drawHit = () => {
-    console.log('drawHit');
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    serverCtx.clearRect(0, 0, serverCtx.canvas.width, serverCtx.canvas.height);
     displayGrid();
-    ctx.fillStyle = 'blue';
     
-    // re-draws the players own ship
-    for(let i = 0; i < ships.length; i++) {
-      ctx.fillRect(ships[i].x,ships[i].y,ships[i].w,ships[i].h);
-    }
-    
-    // draws the clicks of the other player
-    for(let i = 0; i < otherGuesses.length; i++) {
-      ctx.fillStyle = otherGuesses[i].color;
-      console.dir(otherGuesses);
-      ctx.fillRect(otherGuesses[i].x, otherGuesses[i].y, otherGuesses[i].w, otherGuesses[i].h);
-    }
-    
-    // draws the click of this player
-    for(let i = 0; i < myGuesses.length; i++) {
-      console.dir(myGuesses);
-      serverCtx.fillStyle = myGuesses[i].color;
-      serverCtx.fillRect(myGuesses[i].x, myGuesses[i].y, myGuesses[i].w, myGuesses[i].h);
+    // if a player
+    if(!audience) {
+      // re-draws the players own ship
+      for (let i = 0; i < ships.length; i++) {
+        if (ships[i].placed) {
+          for (let j = 0; j < ships[i].parts.length; j++) { 
+            ctx.fillStyle = ships[i].parts[j].color;
+            ctx.fillRect(ships[i].parts[j].x, ships[i].parts[j].y, ships[i].parts[j].w, ships[i].parts[j].h);
+          }
+        }
+      }
+      
+      checkDestroy();
+      
+      // draws the click of this player
+      // green for hit, red for miss
+      for(let i = 0; i < myGuesses.length; i++) {
+        serverCtx.fillStyle = myGuesses[i].color;
+        serverCtx.fillRect(myGuesses[i].x, myGuesses[i].y, myGuesses[i].w, myGuesses[i].h);
+      }
+      
+      for(let i = 0; i < otherGuesses.length; i++) {
+        ctx.fillStyle = otherGuesses[i].color;
+        ctx.fillRect(otherGuesses[i].x, otherGuesses[i].y, otherGuesses[i].w, otherGuesses[i].h);
+      }
+      // if audience
+      } else {
+      // ships for player1
+      for (let i = 0; i < audienceP1.length; i++) {
+        if (audienceP1[i].placed) {
+          for (let j = 0; j < audienceP1[i].parts.length; j++) {
+            ctx.fillStyle = audienceP1[i].parts[j].color;
+            ctx.fillRect(audienceP1[i].parts[j].x, audienceP1[i].parts[j].y, audienceP1[i].parts[j].w, audienceP1[i].parts[j].h);
+          }
+        }
+        // draws attacks that has been made on player1
+        for(let i = 0; i < player1Attacks.length; i++) {
+          ctx.fillStyle = player1Attacks[i].color;
+          ctx.fillRect(player1Attacks[i].x, player1Attacks[i].y, player1Attacks[i].w, player1Attacks[i].h);
+        }
+      }
+        
+      // ships for player2
+      for (let i = 0; i < audienceP2.length; i++) {
+        if (audienceP2[i].placed) {
+          for (let j = 0; j < audienceP2[i].parts.length; j++) {
+            serverCtx.fillStyle = audienceP2[i].parts[j].color;
+            serverCtx.fillRect(audienceP2[i].parts[j].x, audienceP2[i].parts[j].y, audienceP2[i].parts[j].w, audienceP2[i].parts[j].h);
+          }
+        }
+        
+        // draws attacks that has been made on player2
+        for(let i = 0; i < player2Attacks.length; i++) {
+          serverCtx.fillStyle = player2Attacks[i].color;
+          serverCtx.fillRect(player2Attacks[i].x, player2Attacks[i].y, player2Attacks[i].w, player2Attacks[i].h);
+        }
+      }
     }
   };
 
-// method to get mouse position on canvas
+  // checks if player is pressing the "R" key for rotation
+  const checkKeyPress = (e) => {    
+    if (e.keyCode == "82") {
+      if (ship1.placing) ship1.vert = !ship1.vert;
+      if (ship2.placing) ship2.vert = !ship2.vert;
+      if (ship3.placing) ship3.vert = !ship3.vert;
+    }
+  };
+
+  // method to get mouse position on canvas
   const getMousePos = (e, can) => {
     let rect = can.getBoundingClientRect();
           
@@ -117,23 +316,6 @@
     return position;
   };
 
-  // depending on which button that's clicked
-  // to know how many squares to tempoaraly draw
-  const drawShip = (num) => {
-    if (num === 1) {
-      b1 = true;
-      b2 = false;
-      b3 = false;
-    } else if (num === 2) {
-      b2 = true;
-      b1 = false;
-      b3 = false;
-    } else if (num === 3) {
-      b3 = true;
-      b1 = false;
-      b2 = false;
-    }
-  };
 
 // creates the grid on the canvases
  const displayGrid = () => {
@@ -161,238 +343,521 @@
   }
  };
 
-// clears canvas when the drawer prompts it
- const clearCanvas = () => {
-    linesToDraw = [];
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  // changes the layout when a player is don placing their ships on the board
+  const beginGame = () => {
+    document.querySelector("#indexh1").style.display = "none";
+    document.querySelector("#indexh3").style.display = "none";
+    document.querySelector("#serverCanvas").style.display = "inline-block";
+    document.querySelector("#you").style.display = "inline-block";
+    document.querySelector("#opponent").style.display = "inline-block";
+    document.querySelector("#btn4").style.display = "none";
+    document.querySelector("#ships").style.display = "none";
+    document.querySelector("#player1List").style.display = "inline-block";
+    document.querySelector("#player2List").style.display = "inline-block";
   };
 
+  // updates in the beginning
   const updateUserLabel = () => {
     document.querySelector("#indexh1").innerHTML = "Welcome " + user;
     document.querySelector("#indexh1").innerHTML += "<br>Place your ships";
+    document.querySelector("#indexh3").innerHTML += "Press 'R' to rotate";
+
   };
+
+
 
 // ====== SOCKET SERVER CODE =======
 
+
+
   const connectSocket = (e) => {
   document.querySelector("#inputUser").style.display = "none";
-  document.querySelector("#ships").style.display = "inline-block";;
+  document.querySelector("#ships").style.display = "inline-block";
 
   canvas.style.display = "inline-block";
   displayGrid();
   socket = io.connect(); 
     
-    socket.on('connect', () => {
-      
+    socket.on('connect', () => { 
     user = document.querySelector("#username").value;
       
       if (!user) {
         user = 'unknown';
       }
       
-      updateUserLabel();
-      
+      updateUserLabel(); 
       socket.emit('join', { name: user });
-    
-      // if user joins later
-      socket.on('updateCanvas', (data) => {
-        
-      });
     });
     
   socket.on('msg', (data) => {
     console.log(data);
   });
-
-  // upates who is gonna draw next, either retuns true or false
-  // if this client is not a drawer, then hide the clear button
-  // and change text above canvas
-  socket.on('updateDrawer', (msg) => {
-  });
     
-    // clears the canvas of the guessers, as prompted by the drawer
-    socket.on('clearCanvas', () => {
-    clearCanvas();
-  });
+  // set up if an audience
+  socket.on('audienceSetUp', (data) => {
+    // get the name of the players
+    player1 = data.namePlayer1;
+    player2 = data.namePlayer2;
+    // set to true
+    audience = data.audience;
+    // not placing stuff
+    placing = false;
+    
+    // if an audience joins after game already begin, there is more
+    // to be set up
+    if (data.player1B) {
+      console.log("player1 ships: ");
+      console.dir(data.player1B);
+      for (let i = 0; i < data.player1B.length; i++) {
+        audienceP1.push(data.player1B[i]);
+      }
+      console.log("player2 ships: ");
+      console.dir(data.player2B);
+      for (let i = 0; i < data.player2B.length; i++) {
+        audienceP2.push(data.player2B[i]);
+      }
+      console.log("player1 attacks: ");
+      console.dir(data.player1OtherGuesses);
+      if (data.player1OtherGuesses) {
+        for (let i = 0; i < data.player1OtherGuesses.length; i++) {
+         player1Attacks.push(data.player1OtherGuesses[i]);
+      }
+      console.log("player2 attacks: ");
+      console.dir(data.player2OtherGuesses);
+        for (let i = 0; i < data.player2OtherGuesses.length; i++) {
+          player2Attacks.push(data.player2OtherGuesses[i]);
+        }
+      }
+      // if waiting for players to get done, display this text
+    } else {
+        document.querySelector("#guest").style.display = "inline-block";
+      }
+      beginGame();
+      drawHit();
+    });
+
+    // set up for players, get the name of each one
+    socket.on('setup', (data) => {
+      console.dir(data);
+      player1 = data.namePlayer1;
+      player2 = data.namePlayer2;
+    });
     
     // check for button click, when a button is clicked
     // toggle the booleans for drawing
-    const ship1 = document.querySelector("#btn1");
-    ship1.addEventListener('click', (e) => {
-      drawShip(1);
+    const btn1 = document.querySelector("#btn1");
+    btn1.addEventListener('click', (e) => {
+      ship1.placing = true;
+      ship2.placing = false;
+      ship3.placing = false;
     });
-    const ship2 = document.querySelector("#btn2");
-    ship2.addEventListener('click', (e) => {
-      drawShip(2);
+    const btn2 = document.querySelector("#btn2");
+    btn2.addEventListener('click', (e) => {
+      ship2.placing = true;
+      ship1.placing = false;
+      ship3.placing = false;
     });
-    const ship3 = document.querySelector("#btn3");
-    ship3.addEventListener('click', (e) => {
-    drawShip(3);
+    const btn3 = document.querySelector("#btn3");
+    btn3.addEventListener('click', (e) => {
+      ship3.placing = true;
+      ship1.placing = false;
+      ship2.placing = false;
     });
     
     // this begins the game by displaying the other canvas
     const play = document.querySelector("#btn4");
     play.addEventListener('click', (e) => {
-      document.querySelector("#indexh1").style.display = "none";
-      document.querySelector("#serverCanvas").style.display = "inline-block";
-      document.querySelector("#you").style.display = "inline-block";
-      document.querySelector("#opponent").style.display = "inline-block";
-      document.querySelector("#btn4").style.display = "none";
+      beginGame();
+      // tell audience that a player is done placing ships
+      socket.emit('sendBoard', { user, ships, otherGuesses, playing });
     });
     
     // toggles turns
     socket.on('updateTurn', (data) => {
       playing = data;
       if (data) {
-        document.querySelector("#you").innerHTML = "Your turn!";
-        document.querySelector("#opponent").innerHTML = "";
+        // if this user is player1, and it his turn to attach
+        if (player1 === user) {
+          document.querySelector("#you").innerHTML = player1 + " - Your turn, attack here!";
+          document.querySelector("#opponent").innerHTML = player2;
+        // if this user is player2
+        } else {
+          document.querySelector("#you").innerHTML = player2 + " - Your turn, ttack here!";
+          document.querySelector("#opponent").innerHTML = player1;
+        }
       } else {
-        document.querySelector("#you").innerHTML = "";
-        document.querySelector("#opponent").innerHTML = "Opponents turn";
+        // if this user is player1, and it is not his turn
+        if (player1 === user) {
+          document.querySelector("#you").innerHTML = player1;
+          document.querySelector("#opponent").innerHTML = player2 + " - is making a move";
+        // if this user is player2
+        } else {
+          document.querySelector("#you").innerHTML = player2;
+          document.querySelector("#opponent").innerHTML = player1 + " - is making a move";
+        }
       }
+      // tell audience a switch in turns has been made
+      socket.emit('sendBoard', { user, ships, otherGuesses, playing });
+    });
+    
+    // send information to audience
+    socket.on('sendBoard', (data) => {
+      console.dir(data.otherGuesses);
+      // if this user is player1
+      if (data.user === player1) {
+      // get new info about player1 ships
+        audienceP1 = [];
+        player1Attacks = [];
+        for (let i = 0; i < data.ships.length; i++) {
+          audienceP1.push(data.ships[i]);
+        }
+        // get the attacks that has been made on player1
+         for (let i = 0; i < data.otherGuesses; i++) {
+          console.dir(data.otherGuesses[i]);
+          player1Attacks.push(data.otherGuesses[i]);
+        }
+        if (data.playing) {
+          // update text 
+          document.querySelector("#you").innerHTML = player1 + " is making a move";
+          document.querySelector("#opponent").innerHTML = player2;
+        }
+      }
+      if (data.user === player2) {
+        // get new info about player2 shipts
+        audienceP2 = [];
+        // new info about attacks
+        player2Attacks = [];
+        console.dir(data);
+        console.log(data.ships.length);
+         for (let i = 0; i < data.ships.length; i++) {
+          console.dir(data.ships[i]);
+          audienceP2.push(data.ships[i]);
+        }
+        console.dir(data.otherGuesses[i]);
+        for (let i = 0; i < data.otherGuesses; i++) {
+          console.dir(data.otherGuesses[i]);
+           player2Attacks.push(data.otherGuesses[i]);
+        }
+        // get the attacks that has been made on player2
+        console.log(`data.playing ${data.playing}  player2  ${player2}`)
+        if (data.playing) {
+          document.querySelector("#you").innerHTML = player1;
+          document.querySelector("#opponent").innerHTML = player2 + " is making a move";
+        }
+      }
+      drawHit();
     });
     
     // when a check is returned, was either a hit or not
     // draw new square depending on the outcome
     socket.on('check', (data) => {
-      let x = Math.floor(myGuessPos.x/35)*35;
-      let y = Math.floor(myGuessPos.y/35)*35;
-       if (data.hit) {
-          myGuesses.push({ x: x, y: y, w: 35, h: 35, color:'green' });
-       } else {
-         myGuesses.push({ x: x, y: y, w: 35, h: 35, color:'red' });
-       }
-        socket.emit('roundOver');
-        drawHit();
+      console.log("on check");
+      console.dir(data.data);
+      let x = Math.floor(data.data.myGuessPos.x/35)*35;
+      let y = Math.floor(data.data.myGuessPos.y/35)*35;
+      if (data.wasHit) {
+        myGuesses.push({ x: x, y: y, w: 35, h: 35, color:'green' });
+      } else {
+        myGuesses.push({ x: x, y: y, w: 35, h: 35, color:'red' });
+      }
+      socket.emit('roundOver');
+      drawHit();
     });
     
     // a guess has been made from other player
     // check if the person hit or not
     // draw square depending on the outcom
+    // green for miss, and change color of ship part of hit
     // and return a boolean of true/false
      socket.on('guess', (data) => {
-        let x = Math.floor(data.myGuessPos.x/35)*35;
-        let y = Math.floor(data.myGuessPos.y/35)*35;
-        let hit = false;
+      let x = Math.floor(data.myGuessPos.x/35)*35;
+      let y = Math.floor(data.myGuessPos.y/35)*35;
        
-        for(let i = 0; i < ships.length; i++) {
-          if (x === ships[i].x && y === ships[i].y) {
-            hit = true;
-            break;
-          } 
+      let wasHit = false;
+       
+       for (let i = 0; i < ships.length; i++) {
+          for (let j = 0; j < ships[i].parts.length; j++) {
+            if (x === ships[i].parts[j].x && y === ships[i].parts[j].y) {
+              ships[i].parts[j].color = 'red';
+              ships[i].parts[j].hit = true;
+              wasHit = true;
+            }
+          }
         }
-       if (hit) {
-          otherGuesses.push({ x: x, y: y, w: 35, h: 35, color:'green' });
-       } else {
-         otherGuesses.push({ x: x, y: y, w: 35, h: 35, color:'red' });
-       }
-        
+       
+     if (!wasHit) {
+      otherGuesses.push({ x: x, y: y, w: 35, h: 35, color:'green' });
+     }  
        drawHit();
-        socket.emit('check', { hit });
+        socket.emit('check', { wasHit, data });
       });
           
     // ====== MOUSE EVENTS =========
     serverCanvas.onmousedown = (e) => {
       // if it's your turn
         if (playing) {
-           myGuessPos = getMousePos(e, serverCanvas);
+           let myGuessPos = getMousePos(e, serverCanvas);
            socket.emit('guess', { myGuessPos });
         }
       };
     
     canvas.onmousedown = (e) => {
       };
-      canvas.onmouseup = (e) => {
+    canvas.onmouseup = (e) => {
         // only care if the person is the drawer
-        if (placing) {
-          
+    if (placing) {   
           // get curr mouse position on canva
-          let pos = getMousePos(e, canvas);
-          // get a more accurate position, grid-vise
-          // each square on the grid is w: 35 and h: 35
-           let x = Math.floor(pos.x/35)*35;
-           let y = Math.floor(pos.y/35)*35;
-          
-            // make sure you are within the canvas
-            // all other checks is temporary, much find a better more efficient way to do check
-            // to make sure the squares making up the ships are staying within the canvas
-            if (y <= canvas.height && y >= 0) {
-           if (b1) {  
-             let f1;
-             let f2;
-            if (x+35 <= (canvas.width-35)) {
-              f1 = { x: x, y: y, w: 35, h: 35 };
-              f2 = { x: (x+35),y: y, w: 35, h: 35 };
-            } else if (x <= 0) {
-              f1 = { x: 0, y: y, w: 35, h: 35 };
-              f2 = { x: 35,y: y, w: 35, h: 35 };
-            } else {
-              f1 = { x: canvas.width-70, y: y, w: 35, h: 35 };
-              f2 = { x: canvas.width-35,y: y, w: 35, h: 35 };
-            }
-             ships.push(f1);
-             ships.push(f2);
-              b1 = false;
-             btn1 = true;
-              document.querySelector("#btn1").style.display = "none";
-           } else if (b2) {
-             let s1;
-             let s2;
-             let s3;
-              if (x+70 <= (canvas.width-35)) {
-                s1 = { x: x, y: y, w: 35, h: 35 };
-                s2 = { x: (x+35),y: y, w: 35, h: 35 };
-                s3 = { x: (x+70),y: y, w: 35, h: 35 };
-            } else if (x <= 0) {
-                s1 = { x: 0, y: y, w: 35, h: 35 };
-                s2 = { x: 35,y: y, w: 35, h: 35 };
-                s3 = { x: 70,y: y, w: 35, h: 35 };
-            } else {
-                s1 = { x: canvas.width-105, y: y, w: 35, h: 35 };
-                s2 = { x: canvas.width-70,y: y, w: 35, h: 35 };
-                s3 = { x: canvas.width-35,y: y, w: 35, h: 35 };
-            }
-              ships.push(s1);
-              ships.push(s2);
-              ships.push(s3);
-              b2 = false;
-              btn2 = true;
-              document.querySelector("#btn2").style.display = "none";
-           } else if (b3) {
-             let t1;
-             let t2;
-             let t3;
-             let t4;
-             if (x+105 <= (canvas.width-35)) {
-              t1 = { x: x, y: y, w: 35, h: 35 };
-              t2 = { x: (x+35),y: y, w: 35, h: 35 };
-              t3 = { x: (x+70),y: y, w: 35, h: 35 };
-              t4 = { x: (x+105),y: y, w: 35, h: 35 };
-            } else if (x <= 0) {
-              t1 = { x: 0, y: y, w: 35, h: 35 };
-              t2 = { x: 35,y: y, w: 35, h: 35 };
-              t3 = { x: 70,y: y, w: 35, h: 35 };
-              t4 = { x: 105,y: y, w: 35, h: 35 };
-            } else {
-              t1 = { x: canvas.width-140,y: y, w: 35, h: 35 };
-              t2 = { x: canvas.width-105, y: y, w: 35, h: 35 };
-              t3 = { x: canvas.width-70,y: y, w: 35, h: 35 };
-              t4 = { x: canvas.width-35,y: y, w: 35, h: 35 };
-            }
-             ships.push(t1);
-             ships.push(t2);
-             ships.push(t3);
-             ships.push(t4);
-            b3 = false;
-            btn3 = true;
-            document.querySelector("#btn3").style.display = "none";
-           }
-            }
-          if (btn1 && btn2 && btn3) {
-            document.querySelector("#btn4").style.display = "inline-block";
-          };
+     let pos = getMousePos(e, canvas);
+     // get a more accurate position, grid-vise
+     // each square on the grid is w: 35 and h: 35
+     let x = Math.floor(pos.x/35)*35;
+     let y = Math.floor(pos.y/35)*35;
+     
+     if (ship1.placing) {
+       document.querySelector("#btn1").style.display = "none";
+       ship1.placed = true;
+       if (ship1.vert) {
+         if (x >= canvas.width) {
+           ship1.parts[0].x = canvas.width-35;
+           ship1.parts[0].y = y;
+           ship1.parts[1].x = canvas.width-35;
+           ship1.parts[1].y = y+35;
+         } else if (x < 0) {
+           ship1.parts[0].x = 0;
+           ship1.parts[0].y = y;
+           ship1.parts[1].x = 0;
+           ship1.parts[1].y = y+35;
+         } else if (y+35 >= canvas.height) {
+           ship1.parts[0].x = x;
+           ship1.parts[0].y = canvas.height-70;
+           ship1.parts[1].x = x;
+           ship1.parts[1].y = canvas.height-35;
+         } else if (y < 0) {
+           ship1.parts[0].x = x;
+           ship1.parts[0].y = 0;
+           ship1.parts[1].x = x;
+           ship1.parts[1].y = 35;
+         } else {
+           ship1.parts[0].x = x;
+           ship1.parts[0].y = y;
+           ship1.parts[1].x = x;
+           ship1.parts[1].y = y+35;
+         }
+       } else {
+         if (x+35 >= canvas.width) {
+           ship1.parts[0].x = canvas.width-70;
+           ship1.parts[0].y = y;
+           ship1.parts[1].x = canvas.width-35;
+           ship1.parts[1].y = y;
+         } else if (x < 0) {
+           ship1.parts[0].x = 0;
+           ship1.parts[0].y = y;
+           ship1.parts[1].x = 35;
+           ship1.parts[1].y = y;
+         } else if (y >= canvas.height) {
+           ship1.parts[0].x = x;
+           ship1.parts[0].y = canvas.height-35;
+           ship1.parts[1].x = x+35;
+           ship1.parts[1].y = canvas.height-35;
+         } else if(y < 0) {
+           ship1.parts[0].x = x;
+           ship1.parts[0].y = 0;
+           ship1.parts[1].x = x+35;
+           ship1.parts[1].y = 0;
+         } else {
+           ship1.parts[0].x = x;
+           ship1.parts[0].y = y;
+           ship1.parts[1].x = x+35;
+           ship1.parts[1].y = y;
+         }
+       }
+       ship1.placing = false;
+      } // end ship1
+      if (ship2.placing) {
+        ship2.placed = true;
+        document.querySelector("#btn2").style.display = "none";
+        if (ship2.vert) {
+          if (x >= canvas.width) {
+            ship2.parts[0].x = canvas.width-35;
+            ship2.parts[0].y = y;
+            ship2.parts[1].x = canvas.width-35;
+            ship2.parts[1].y = y+35;
+            ship2.parts[2].x = canvas.width-35;
+            ship2.parts[2].y = y+70;
+          } else if (x < 0) {
+            ship2.parts[0].x = 0;
+            ship2.parts[0].y = y;
+            ship2.parts[1].x = 0;
+            ship2.parts[1].y = y+35;
+            ship2.parts[2].x = 0;
+            ship2.parts[2].y = y+70;
+          } else if (y+70 >= canvas.height) {
+            ship2.parts[0].x = x;
+            ship2.parts[0].y = canvas.height-105;
+            ship2.parts[1].x = x;
+            ship2.parts[1].y = canvas.height-70;
+            ship2.parts[2].x = x;
+            ship2.parts[2].y = canvas.height-35;
+          } else if (y < 0) {
+            ship2.parts[0].x = x;
+            ship2.parts[0].y = 0;
+            ship2.parts[1].x = x;
+            ship2.parts[1].y = 35;
+            ship2.parts[2].x = x;
+            ship2.parts[2].y = 70;
+          } else {
+           ship2.parts[0].x = x;
+           ship2.parts[0].y = y;
+           ship2.parts[1].x = x;
+           ship2.parts[1].y = y+35;
+           ship2.parts[2].x = x;
+           ship2.parts[2].y = y+70;
+         }
+        } else {
+          if (x+70 >= canvas.width) {
+            ship2.parts[0].x = canvas.width-105;
+            ship2.parts[0].y = y;
+            ship2.parts[1].x = canvas.width-70;
+            ship2.parts[1].y = y;
+            ship2.parts[2].x = canvas.width-35;
+            ship2.parts[2].y = y;
+          } else if (x < 0) {
+            ship2.parts[0].x = 0;
+            ship2.parts[0].y = y;
+            ship2.parts[1].x = 35;
+            ship2.parts[1].y = y;
+            ship2.parts[2].x = 70;
+            ship2.parts[2].y = y;
+          } else if(y >= canvas.height) {
+            ship2.parts[0].x = x;
+            ship2.parts[0].y = canvas.height-35;
+            ship2.parts[1].x = x+35;
+            ship2.parts[1].y = canvas.height-35;
+            ship2.parts[2].x = x+70;
+            ship2.parts[2].y = canvas.height-35;
+          } else if (y < 0) {
+            ship2.parts[0].x = x;
+            ship2.parts[0].y = canvas.height-35;
+            ship2.parts[1].x = x+35;
+            ship2.parts[1].y = canvas.height-35;
+            ship2.parts[2].x = x+70;
+            ship2.parts[2].y = canvas.height-35;
+          } else {
+            ship2.parts[0].x = x;
+            ship2.parts[0].y = y;
+            ship2.parts[1].x = x+35;
+            ship2.parts[1].y = y;
+            ship2.parts[2].x = x+70;
+            ship2.parts[2].y = y;
+          }
         }
+        ship2.placing = false;
+      } // end ship2 
+      if (ship3.placing) {
+        ship3.placed = true;
+        document.querySelector("#btn3").style.display = "none";
+        if (ship3.vert) {
+          if (x >= canvas.width) {
+            ship3.parts[0].x = canvas.width-35;
+            ship3.parts[0].y = y;
+            ship3.parts[1].x = canvas.width-35;
+            ship3.parts[1].y = y;
+            ship3.parts[2].x = canvas.width-35;
+            ship3.parts[2].y = y;
+            ship3.parts[3].x = canvas.width-35;
+            ship3.parts[3].y = y;
+          } else if (x < 0) {
+            ship3.parts[0].x = 0;
+            ship3.parts[0].y = y;
+            ship3.parts[1].x = 0;
+            ship3.parts[1].y = y+35;
+            ship3.parts[2].x = 0;
+            ship3.parts[2].y = y+70;
+            ship3.parts[3].x = 0;
+            ship3.parts[3].y = y+105;
+          } else if (y+105 >= canvas.height) {
+            ship3.parts[0].x = x;
+            ship3.parts[0].y = canvas.height-140;
+            ship3.parts[1].x = x;
+            ship3.parts[1].y = canvas.height-105;
+            ship3.parts[2].x = x;
+            ship3.parts[2].y = canvas.height-70;
+            ship3.parts[3].x = x;
+            ship3.parts[3].y = canvas.height-35;
+          } else if(y < 0) {
+            ship3.parts[0].x = x;
+            ship3.parts[0].y = 0;
+            ship3.parts[1].x = x;
+            ship3.parts[1].y = 35;
+            ship3.parts[2].x = x;
+            ship3.parts[2].y = 70;
+            ship3.parts[3].x = x;
+            ship3.parts[3].y = 105;
+          } else {
+            ship3.parts[0].x = x;
+            ship3.parts[0].y = y;
+            ship3.parts[1].x = x;
+            ship3.parts[1].y = y+35;
+            ship3.parts[2].x = x;
+            ship3.parts[2].y = y+70;
+            ship3.parts[3].x = x;
+            ship3.parts[3].y = y+105;
+          }
+        } else {
+          if (x+105 >= canvas.width) {
+            ship3.parts[0].x = canvas.width-140;
+            ship3.parts[0].y = y;
+            ship3.parts[1].x = canvas.width-105;
+            ship3.parts[1].y = y;
+            ship3.parts[2].x = canvas.width-70;
+            ship3.parts[2].y = y;
+            ship3.parts[3].x = canvas.width-35;
+            ship3.parts[3].y = y;
+          } else if (x < 0) {
+            ship3.parts[0].x = 0;
+            ship3.parts[0].y = y;
+            ship3.parts[1].x = 35;
+            ship3.parts[1].y = y;
+            ship3.parts[2].x = 70;
+            ship3.parts[2].y = y;
+            ship3.parts[3].x = 105;
+            ship3.parts[3].y = y; 
+          } else if (y >= canvas.height) {
+            ship3.parts[0].x = x;
+            ship3.parts[0].y = canvas.height-35;
+            ship3.parts[1].x = x+35;
+            ship3.parts[1].y = canvas.height-35;
+            ship3.parts[2].x = x+70;
+            ship3.parts[2].y = canvas.height-35;
+            ship3.parts[3].x = x+105;
+            ship3.parts[3].y = canvas.height-35; 
+          } else if (y < 0) {
+            ship3.parts[0].x = x;
+            ship3.parts[0].y = 0;
+            ship3.parts[1].x = x+35;
+            ship3.parts[1].y = 0;
+            ship3.parts[2].x = x+70;
+            ship3.parts[2].y = 0;
+            ship3.parts[3].x = x+105;
+            ship3.parts[3].y = 0; 
+          } else {
+            ship3.parts[0].x = x;
+            ship3.parts[0].y = y;
+            ship3.parts[1].x = x+35;
+            ship3.parts[1].y = y;
+            ship3.parts[2].x = x+70;
+            ship3.parts[2].y = y;
+            ship3.parts[3].x = x+105;
+            ship3.parts[3].y = y;
+          }
+        }
+          ship3.placing = false;
+      } // end ship3      
+    }
+      if (ship1.placed && ship2.placed && ship3.placed) {
+        document.querySelector("#btn4").style.display = "inline-block";
       };
+    };
 
       canvas.onmousemove = (e) => {
         // if you are currently holding down the mouse, and you are the drawer
@@ -418,7 +883,8 @@
     connect.addEventListener('click', () => {
       console.log('connect');
       connectSocket();
-    });
-  }; 
+    });  
+  };
+window.onload = init;
 
-  window.onload = init;
+window.addEventListener("keyup", checkKeyPress, false);
